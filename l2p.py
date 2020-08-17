@@ -9,19 +9,23 @@ try:
 except:
     fileroot = raw_input("File Name (without extension): ")
 
+libext = '.mnlgxdlib'
+presetext = '.mnlgxdpreset'
  
 def unzip(source_filename, dest_dir):
     with zipfile.ZipFile(source_filename) as zf:
         zf.extractall(dest_dir)
     return
     
-print(fileroot)
-libname = fileroot + '.mnlglib'
-print(libname)
-presetname = fileroot + '.mnlgpreset'
+if fileroot.endswith(libext):
+    fileroot = fileroot[:-len(libext)]
+
+libname = fileroot + libext
+print('Converting "{}" to preset file'.format(libname))
+presetname = fileroot + presetext
 if not os.path.exists('presetarchive'):
     os.mkdir('presetarchive')
-libname = fileroot + '.mnlglib'
+libname = fileroot + libext
 unzip((libname), 'presetarchive')
 os.remove('presetarchive/FavoriteData.fav_data')
 shutil.copy('template/FileInformation.xml', 'presetarchive')
@@ -33,7 +37,9 @@ for i, elem in enumerate(root):
 
 tree.write('presetarchive/PresetInformation.xml')
 shutil.make_archive(fileroot,'zip','presetarchive')
-os.rename(fileroot + '.zip',fileroot + '.mnlgpreset')
+os.rename(fileroot + '.zip', presetname)
 
 print("Cleaning Up...")
 shutil.rmtree('presetarchive')
+
+print('Preset file is "{}"'.format(presetname))
